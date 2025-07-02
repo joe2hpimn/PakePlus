@@ -1,32 +1,936 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flymeo AI智能助手 - Flymeo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 主聊天界面 -->
+        <div class="main-chat-area">
+            <!-- 顶部导航 -->
+            <header class="top-nav">
+                <div class="nav-left">
+                    <div class="logo">
+                        <i class="fas fa-brain"></i>
+                        <span>Flymeo AI</span>
+                    </div>
+                </div>
+                <div class="nav-center">
+                    <div class="tab-switcher">
+                        <button class="tab-btn active" data-tab="chat">
+                            <i class="fas fa-comments"></i>
+                            <span>Meo助手</span>
+                        </button>
+                        <button class="tab-btn" data-tab="dashboard">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>我的数据看板</span>
+                        </button>
+                        <button class="tab-btn" data-tab="butler">
+                            <i class="fas fa-robot"></i>
+                            <span>Meo管家</span>
+                        </button>
+                        <button class="tab-btn" data-tab="reports">
+                            <i class="fas fa-file-chart"></i>
+                            <span>报告中心</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="nav-right">
+                    <div class="user-menu">
+                        <div class="user-avatar-default" data-name="张经理">
+                            张
+                        </div>
+                        <span class="user-name">张经理</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </header>
 
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
-            <form class="row" id="greet-form">
-                <input id="inputValue" placeholder="Enter a something..." />
-            </form>
-            <div class="resultBox">
-                <span>result: </span>
-                <span id="result"></span>
+            <!-- 聊天内容区 -->
+            <div id="chat" class="content-area active">
+                <div class="chat-container-with-workspace">
+                    <!-- AI 工作区 -->
+                    <div class="ai-workspace" id="aiWorkspace">
+                        <div class="workspace-header">
+                            <h3>🔍 AI实时洞察</h3>
+                            <div class="workspace-controls">
+                                <button class="clear-btn" id="clearWorkspace" title="清除历史记录">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                <div class="workspace-status" id="workspaceStatus">
+                                    <span class="status-text">待机中</span>
+                                    <div class="status-indicator"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 流程卡片容器 -->
+                        <div class="process-container" id="processContainer">
+                            <!-- 占位符 -->
+                            <div class="workspace-placeholder" id="workspacePlaceholder">
+                                <div class="placeholder-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h4>AI分析引擎就绪</h4>
+                                <p>发送消息开始智能分析，实时查看AI的思考过程</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 进度指示器 -->
+                        <div class="progress-footer" id="progressFooter" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">分析进度: 0%</div>
+                        </div>
+                    </div>
+
+                    <!-- 原聊天区域 -->
+                    <div class="chat-wrapper">
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- 欢迎消息 -->
+                            <div class="welcome-section">
+                                <div class="ai-avatar-large">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <h2>您好！我是您的专属数据分析师</h2>
+                                <p>我可以帮您分析亚马逊平台数据、生成专业报告、预测市场趋势。对话中生成的图表和报告将自动保存到您的个人数据看板！</p>
+                                
+                                <!-- 快捷操作卡片 -->
+                                <div class="quick-cards">
+                                    <div class="quick-card" data-action="sales-analysis">
+                                        <i class="fas fa-chart-line"></i>
+                                        <h4>销售分析</h4>
+                                        <p>深度分析销售数据和趋势，生成可视化图表</p>
+                                    </div>
+                                    <div class="quick-card" data-action="competitor-analysis">
+                                        <i class="fas fa-users"></i>
+                                        <h4>竞品研究</h4>
+                                        <p>全面的竞争对手分析，保存到仪表盘</p>
+                                    </div>
+                                    <div class="quick-card" data-action="trend-prediction">
+                                        <i class="fas fa-crystal-ball"></i>
+                                        <h4>趋势预测</h4>
+                                        <p>基于AI的市场预测，生成预测图表</p>
+                                    </div>
+                                    <div class="quick-card" data-action="ad-optimization">
+                                        <i class="fas fa-bullhorn"></i>
+                                        <h4>广告优化</h4>
+                                        <p>智能广告策略建议，ROI分析图表</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 输入区域 -->
+                        <div class="chat-input-area">
+                            <div class="input-container">
+                                <div class="input-wrapper">
+                                    <textarea id="chatInput" placeholder="描述您的需求，我将为您提供专业的分析和建议，并生成可保存的图表报告..." rows="1"></textarea>
+                                    <div class="input-actions">
+                                        <button class="action-btn voice-btn" id="voiceBtn" onclick="toggleVoiceInput()" title="语音输入">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                        <button class="action-btn attach-btn" title="上传文件">
+                                            <i class="fas fa-paperclip"></i>
+                                        </button>
+                                        <button class="send-btn" onclick="sendMessage()" title="发送消息">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="input-footer">
+                                    <span class="input-hint">按 Enter 发送，Shift + Enter 换行</span>
+                                    <div class="ai-status">
+                                        <span class="status-dot"></span>
+                                        <span>AI助手在线</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="invokeBox">
-                <button id="openUrl">open_url_browser</button>
-                <button id="openUrlNew">open_url_new</button>
-                <button id="runCommand">run_command</button>
-                <button id="downloadFile">download_file</button>
-                <button id="getExeDir">get_exe_dir</button>
-                <button id="getEnvVar">get_env_var</button>
-                <button id="findPort">find_port</button>
+
+            <!-- 我的数据看板内容 -->
+            <div id="dashboard" class="content-area">
+                <div class="dashboard-wrapper">
+                    <div class="dashboard-header">
+                        <div class="header-content">
+                            <h2>我的数据看板</h2>
+                            <p>您的专属数据分析中心，所有对话生成的图表和报告都在这里</p>
+                        </div>
+                        <div class="dashboard-actions">
+                            <button class="btn-outline" onclick="customizeDashboard()">
+                                <i class="fas fa-cog"></i>
+                                自定义布局
+                            </button>
+                            <button class="btn-primary" onclick="exportDashboard()">
+                                <i class="fas fa-download"></i>
+                                导出仪表盘
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 仪表盘网格 -->
+                    <div class="dashboard-grid" id="dashboardGrid">
+                        <!-- 核心指标卡片 -->
+                        <div class="dashboard-card metrics-card" data-card-id="core-metrics">
+                            <div class="card-header">
+                                <h3>核心业务指标</h3>
+                                <div class="card-actions">
+                                    <button class="card-action-btn" onclick="refreshCard('core-metrics')">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <button class="card-action-btn" onclick="removeCard('core-metrics')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="metrics-grid">
+                                <!-- 主要指标 - 占据更大空间 -->
+                                <div class="metric-item primary">
+                                    <div class="metric-icon">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="metric-value">$125,430</div>
+                                    <div class="metric-label">总销售额</div>
+                                    <div class="metric-change positive">
+                                        <i class="fas fa-arrow-up"></i>
+                                        +12.5%
+                                    </div>
+                                </div>
+                                
+                                <!-- 次要指标 - 较小的卡片 -->
+                                <div class="metric-item secondary">
+                                    <div class="metric-header">
+                                        <div class="metric-icon small">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </div>
+                                        <div class="metric-change positive">+8.3%</div>
+                                    </div>
+                                    <div class="metric-value">1,234</div>
+                                    <div class="metric-label">订单数量</div>
+                                </div>
+                                
+                                <div class="metric-item secondary">
+                                    <div class="metric-header">
+                                        <div class="metric-icon small">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="metric-change negative">-2.1%</div>
+                                    </div>
+                                    <div class="metric-value">856</div>
+                                    <div class="metric-label">新客户</div>
+                                </div>
+                                
+                                <div class="metric-item secondary">
+                                    <div class="metric-header">
+                                        <div class="metric-icon small">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="metric-change positive">+0.5%</div>
+                                    </div>
+                                    <div class="metric-value">3.2%</div>
+                                    <div class="metric-label">转化率</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 销售趋势图表 -->
+                        <div class="dashboard-card chart-card" data-card-id="sales-trend">
+                            <div class="card-header">
+                                <h3>销售趋势分析</h3>
+                                <div class="card-actions">
+                                    <select class="time-selector">
+                                        <option value="7d">近7天</option>
+                                        <option value="30d" selected>近30天</option>
+                                        <option value="90d">近90天</option>
+                                    </select>
+                                    <button class="card-action-btn" onclick="saveToReports('sales-trend')">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="salesTrendChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 产品排行 -->
+                        <div class="dashboard-card ranking-card" data-card-id="product-ranking">
+                            <div class="card-header">
+                                <h3>热门产品排行</h3>
+                                <div class="card-actions">
+                                    <button class="card-action-btn" onclick="expandCard('product-ranking')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="ranking-list">
+                                <div class="ranking-item">
+                                    <div class="rank-number">1</div>
+                                    <div class="product-info">
+                                        <span class="product-name">无线蓝牙耳机</span>
+                                        <span class="product-sales">$12,450</span>
+                                    </div>
+                                    <div class="trend-indicator positive">+15%</div>
+                                </div>
+                                <div class="ranking-item">
+                                    <div class="rank-number">2</div>
+                                    <div class="product-info">
+                                        <span class="product-name">智能手表</span>
+                                        <span class="product-sales">$9,230</span>
+                                    </div>
+                                    <div class="trend-indicator positive">+8%</div>
+                                </div>
+                                <div class="ranking-item">
+                                    <div class="rank-number">3</div>
+                                    <div class="product-info">
+                                        <span class="product-name">手机保护壳</span>
+                                        <span class="product-sales">$7,890</span>
+                                    </div>
+                                    <div class="trend-indicator negative">-3%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 空白卡片占位符 -->
+                        <div class="dashboard-card add-card" onclick="showAddCardModal()">
+                            <div class="add-card-content">
+                                <i class="fas fa-plus"></i>
+                                <span>添加新图表</span>
+                                <p>从对话中生成或选择预设图表</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </main>
-    </body>
+
+            <!-- Meo管家内容 -->
+            <div id="butler" class="content-area">
+                <div class="butler-wrapper">
+                    <div class="butler-header">
+                        <div class="header-content">
+                            <h2>🤖 Meo管家</h2>
+                            <p>亚马逊跨境电商智能运营助手 | 基于多智能体技术，自动规划日常运营</p>
+                        </div>
+                        <div class="butler-status">
+                            <div class="status-indicator active"></div>
+                            <span>AI管家在线</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 左右两栏布局 -->
+                    <div class="butler-main-layout">
+                        <!-- 左侧：运营人员关键工作 -->
+                        <div class="butler-left-panel">
+                            <div class="panel-header">
+                                <h3>📋 运营关键工作</h3>
+                                <div class="panel-actions">
+                                    <button class="btn-outline btn-sm" onclick="refreshWorkTasks()">
+                                        <i class="fas fa-sync-alt"></i> 刷新
+                                    </button>
+                                    <button class="btn-primary btn-sm" onclick="createNewTask()">
+                                        <i class="fas fa-plus"></i> 新建任务
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 今日重点任务 -->
+                            <div class="work-section">
+                                <h4>🔥 今日重点</h4>
+                                <div class="work-cards">
+                                    <div class="work-card urgent">
+                                        <div class="work-header">
+                                            <div class="work-icon">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                            <div class="work-priority">紧急</div>
+                                        </div>
+                                        <h5>库存预警处理</h5>
+                                        <p>15个SKU库存不足7天，需立即补货</p>
+                                        <div class="work-meta">
+                                            <span class="deadline">⏰ 今日 18:00</span>
+                                            <span class="assignee">👤 张经理</span>
+                                        </div>
+                                        <div class="work-actions">
+                                            <button class="btn-danger btn-xs" onclick="handleUrgentTask('inventory-alert')">
+                                                立即处理
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="work-card high">
+                                        <div class="work-header">
+                                            <div class="work-icon">
+                                                <i class="fas fa-chart-line"></i>
+                                            </div>
+                                            <div class="work-priority">高优先级</div>
+                                        </div>
+                                        <h5>Q1销售复盘</h5>
+                                        <p>分析Q1销售数据，制定Q2策略</p>
+                                        <div class="work-meta">
+                                            <span class="deadline">⏰ 明日 12:00</span>
+                                            <span class="assignee">👤 李分析师</span>
+                                        </div>
+                                        <div class="work-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 60%"></div>
+                                            </div>
+                                            <span class="progress-text">60%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="work-card medium">
+                                        <div class="work-header">
+                                            <div class="work-icon">
+                                                <i class="fas fa-tags"></i>
+                                            </div>
+                                            <div class="work-priority">中优先级</div>
+                                        </div>
+                                        <h5>新品上架优化</h5>
+                                        <p>优化5个新品的标题和关键词</p>
+                                        <div class="work-meta">
+                                            <span class="deadline">⏰ 本周五</span>
+                                            <span class="assignee">👤 王运营</span>
+                                        </div>
+                                        <div class="work-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 30%"></div>
+                                            </div>
+                                            <span class="progress-text">30%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 本周计划 -->
+                            <div class="work-section">
+                                <h4>📅 本周计划</h4>
+                                <div class="weekly-tasks">
+                                    <div class="task-item completed">
+                                        <div class="task-checkbox">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="task-content">
+                                            <span class="task-title">竞品价格监控</span>
+                                            <span class="task-date">周一 已完成</span>
+                                        </div>
+                                    </div>
+                                    <div class="task-item in-progress">
+                                        <div class="task-checkbox">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="task-content">
+                                            <span class="task-title">广告投放优化</span>
+                                            <span class="task-date">周二 进行中</span>
+                                        </div>
+                                    </div>
+                                    <div class="task-item pending">
+                                        <div class="task-checkbox">
+                                            <i class="fas fa-circle"></i>
+                                        </div>
+                                        <div class="task-content">
+                                            <span class="task-title">客户反馈分析</span>
+                                            <span class="task-date">周三 待开始</span>
+                                        </div>
+                                    </div>
+                                    <div class="task-item pending">
+                                        <div class="task-checkbox">
+                                            <i class="fas fa-circle"></i>
+                                        </div>
+                                        <div class="task-content">
+                                            <span class="task-title">月度报告准备</span>
+                                            <span class="task-date">周四 待开始</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- AI助手建议 -->
+                            <div class="work-section">
+                                <h4>🤖 AI助手建议</h4>
+                                <div class="ai-suggestions">
+                                    <div class="suggestion-item">
+                                        <div class="suggestion-icon">
+                                            <i class="fas fa-lightbulb"></i>
+                                        </div>
+                                        <div class="suggestion-content">
+                                            <p>建议优先处理"无线耳机"类目的库存补充，该类目近7天销量增长35%</p>
+                                            <button class="btn-link" onclick="applySuggestion('inventory-priority')">
+                                                采纳建议 →
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="suggestion-item">
+                                        <div class="suggestion-icon">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                        <div class="suggestion-content">
+                                            <p>检测到竞品降价，建议调整"智能手表"的广告出价策略</p>
+                                            <button class="btn-link" onclick="applySuggestion('price-strategy')">
+                                                查看详情 →
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间：智能体工作规划 -->
+                        <div class="butler-center-panel">
+                            <div class="panel-header">
+                                <h3>🤖 智能体任务规划</h3>
+                                <div class="panel-actions">
+                                    <button class="btn-outline btn-sm" onclick="refreshAgentPlan()">
+                                        <i class="fas fa-sync-alt"></i> 刷新规划
+                                    </button>
+                                    <button class="btn-primary btn-sm" onclick="customizeAgentPlan()">
+                                        <i class="fas fa-cog"></i> 自定义
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 今日自动规划 -->
+                            <div class="agent-section">
+                                <h4>📋 今日自动规划</h4>
+                                <div class="workflow-steps">
+                                    <div class="workflow-step completed" onclick="viewStepDetails('patrol')">
+                                        <div class="step-indicator">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="step-content">
+                                            <h5>关键信息巡查</h5>
+                                            <p>监控竞品动态、市场变化、客户反馈</p>
+                                            <div class="step-meta">
+                                                <span class="step-time">⏰ 06:00 - 08:00</span>
+                                                <span class="step-status completed">已完成</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="workflow-step in-progress" onclick="viewStepDetails('analysis')">
+                                        <div class="step-indicator">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        </div>
+                                        <div class="step-content">
+                                            <h5>核心数据分析</h5>
+                                            <p>分析销售数据、流量数据、转化指标</p>
+                                            <div class="step-meta">
+                                                <span class="step-time">⏰ 08:00 - 10:00</span>
+                                                <span class="step-status in-progress">进行中</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="workflow-step pending" onclick="viewStepDetails('strategy')">
+                                        <div class="step-indicator">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="step-content">
+                                            <h5>攻防策略制定</h5>
+                                            <p>制定流量攻防策略、竞品应对方案</p>
+                                            <div class="step-meta">
+                                                <span class="step-time">⏰ 10:00 - 12:00</span>
+                                                <span class="step-status pending">待执行</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="workflow-step pending" onclick="viewStepDetails('report')">
+                                        <div class="step-indicator">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="step-content">
+                                            <h5>运营日志生成</h5>
+                                            <p>生成今日运营总结和明日建议</p>
+                                            <div class="step-meta">
+                                                <span class="step-time">⏰ 18:00 - 19:00</span>
+                                                <span class="step-status pending">待执行</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 智能体状态 -->
+                            <div class="agent-section">
+                                <h4>🔄 智能体状态</h4>
+                                <div class="agent-status-grid">
+                                    <div class="agent-status-item active">
+                                        <div class="agent-icon">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <div class="agent-info">
+                                            <span class="agent-name">监控智能体</span>
+                                            <span class="agent-status">运行中</span>
+                                        </div>
+                                    </div>
+                                    <div class="agent-status-item active">
+                                        <div class="agent-icon">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                        <div class="agent-info">
+                                            <span class="agent-name">分析智能体</span>
+                                            <span class="agent-status">运行中</span>
+                                        </div>
+                                    </div>
+                                    <div class="agent-status-item standby">
+                                        <div class="agent-icon">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <div class="agent-info">
+                                            <span class="agent-name">防御智能体</span>
+                                            <span class="agent-status">待机中</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：亚马逊流量攻防预警 -->
+                        <div class="butler-right-panel">
+                            <div class="panel-header">
+                                <h3>⚔️ 流量攻防中心</h3>
+                                <div class="panel-actions">
+                                    <button class="btn-outline btn-sm" onclick="refreshTrafficData()">
+                                        <i class="fas fa-sync-alt"></i> 刷新数据
+                                    </button>
+                                    <button class="btn-primary btn-sm" onclick="openTrafficStrategy()">
+                                        <i class="fas fa-strategy"></i> 策略配置
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 实时预警 -->
+                            <div class="traffic-section">
+                                <h4>🚨 实时预警</h4>
+                                <div class="alert-cards">
+                                    <div class="alert-card critical">
+                                        <div class="alert-header">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </div>
+                                            <div class="alert-level">严重</div>
+                                            <div class="alert-time">2分钟前</div>
+                                        </div>
+                                        <h5>竞品恶意跟卖检测</h5>
+                                        <p>检测到3个SKU出现跟卖，正在抢夺Buy Box</p>
+                                        <div class="alert-details">
+                                            <span class="affected-products">影响产品: B08XXX123, B08XXX456, B08XXX789</span>
+                                        </div>
+                                        <div class="alert-actions">
+                                            <button class="btn-danger btn-xs" onclick="handleCriticalAlert('hijack-detection')">
+                                                立即反击
+                                            </button>
+                                            <button class="btn-outline btn-xs" onclick="viewAlertDetails('hijack-detection')">
+                                                查看详情
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-card warning">
+                                        <div class="alert-header">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                            </div>
+                                            <div class="alert-level">警告</div>
+                                            <div class="alert-time">15分钟前</div>
+                                        </div>
+                                        <h5>广告点击异常</h5>
+                                        <p>"无线耳机"广告点击率突然下降40%</p>
+                                        <div class="alert-details">
+                                            <span class="metric-change">CTR: 2.3% → 1.4% ↓40%</span>
+                                        </div>
+                                        <div class="alert-actions">
+                                            <button class="btn-warning btn-xs" onclick="optimizeAds('wireless-earphone')">
+                                                优化广告
+                                            </button>
+                                            <button class="btn-outline btn-xs" onclick="analyzeAdPerformance('wireless-earphone')">
+                                                分析原因
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-card info">
+                                        <div class="alert-header">
+                                            <div class="alert-icon">
+                                                <i class="fas fa-info-circle"></i>
+                                            </div>
+                                            <div class="alert-level">提醒</div>
+                                            <div class="alert-time">1小时前</div>
+                                        </div>
+                                        <h5>关键词排名变化</h5>
+                                        <p>核心关键词"bluetooth headphones"排名上升</p>
+                                        <div class="alert-details">
+                                            <span class="ranking-change">排名: #15 → #8 ↑7位</span>
+                                        </div>
+                                        <div class="alert-actions">
+                                            <button class="btn-success btn-xs" onclick="reinforceKeyword('bluetooth-headphones')">
+                                                加强优化
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 执行策略 -->
+                            <div class="traffic-section">
+                                <h4>🎯 执行策略</h4>
+                                <div class="strategy-cards">
+                                    <div class="strategy-card active">
+                                        <div class="strategy-header">
+                                            <div class="strategy-icon">
+                                                <i class="fas fa-shield-alt"></i>
+                                            </div>
+                                            <div class="strategy-status running">执行中</div>
+                                        </div>
+                                        <h5>防御策略 - 反跟卖</h5>
+                                        <p>自动监控跟卖行为，发现后立即举报并调整价格</p>
+                                        <div class="strategy-metrics">
+                                            <div class="metric">
+                                                <span class="metric-value">12</span>
+                                                <span class="metric-label">今日拦截</span>
+                                            </div>
+                                            <div class="metric">
+                                                <span class="metric-value">98%</span>
+                                                <span class="metric-label">成功率</span>
+                                            </div>
+                                        </div>
+                                        <div class="strategy-actions">
+                                            <button class="btn-outline btn-xs" onclick="pauseStrategy('anti-hijack')">
+                                                暂停策略
+                                            </button>
+                                            <button class="btn-primary btn-xs" onclick="configStrategy('anti-hijack')">
+                                                调整参数
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="strategy-card">
+                                        <div class="strategy-header">
+                                            <div class="strategy-icon">
+                                                <i class="fas fa-rocket"></i>
+                                            </div>
+                                            <div class="strategy-status ready">就绪</div>
+                                        </div>
+                                        <h5>攻击策略 - 关键词狙击</h5>
+                                        <p>针对竞品核心关键词进行精准投放</p>
+                                        <div class="strategy-metrics">
+                                            <div class="metric">
+                                                <span class="metric-value">25</span>
+                                                <span class="metric-label">目标词</span>
+                                            </div>
+                                            <div class="metric">
+                                                <span class="metric-value">$2.3</span>
+                                                <span class="metric-label">平均CPC</span>
+                                            </div>
+                                        </div>
+                                        <div class="strategy-actions">
+                                            <button class="btn-success btn-xs" onclick="launchStrategy('keyword-snipe')">
+                                                启动策略
+                                            </button>
+                                            <button class="btn-outline btn-xs" onclick="previewStrategy('keyword-snipe')">
+                                                预览效果
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="strategy-card">
+                                        <div class="strategy-header">
+                                            <div class="strategy-icon">
+                                                <i class="fas fa-chart-line"></i>
+                                            </div>
+                                            <div class="strategy-status scheduled">已安排</div>
+                                        </div>
+                                        <h5>监控策略 - 价格跟踪</h5>
+                                        <p>实时监控竞品价格变化，自动调整定价策略</p>
+                                        <div class="strategy-schedule">
+                                            <span class="schedule-time">⏰ 每日 09:00, 15:00, 21:00</span>
+                                        </div>
+                                        <div class="strategy-actions">
+                                            <button class="btn-primary btn-xs" onclick="runNowStrategy('price-monitor')">
+                                                立即执行
+                                            </button>
+                                            <button class="btn-outline btn-xs" onclick="editSchedule('price-monitor')">
+                                                编辑计划
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 流量分析 -->
+                            <div class="traffic-section">
+                                <h4>📊 流量分析</h4>
+                                <div class="traffic-overview">
+                                    <div class="traffic-metrics">
+                                        <div class="traffic-metric">
+                                            <div class="metric-icon">
+                                                <i class="fas fa-eye"></i>
+                                            </div>
+                                            <div class="metric-data">
+                                                <span class="metric-value">15,234</span>
+                                                <span class="metric-label">今日流量</span>
+                                                <span class="metric-change positive">+8.5%</span>
+                                            </div>
+                                        </div>
+                                        <div class="traffic-metric">
+                                            <div class="metric-icon">
+                                                <i class="fas fa-mouse-pointer"></i>
+                                            </div>
+                                            <div class="metric-data">
+                                                <span class="metric-value">3.2%</span>
+                                                <span class="metric-label">转化率</span>
+                                                <span class="metric-change negative">-0.3%</span>
+                                            </div>
+                                        </div>
+                                        <div class="traffic-metric">
+                                            <div class="metric-icon">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                            <div class="metric-data">
+                                                <span class="metric-value">68%</span>
+                                                <span class="metric-label">搜索流量</span>
+                                                <span class="metric-change positive">+2.1%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="traffic-chart">
+                                        <canvas id="trafficTrendChart" width="300" height="150"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 报告中心内容 -->
+            <div id="reports" class="content-area">
+                <div class="reports-wrapper">
+                    <div class="reports-header">
+                        <div class="header-content">
+                            <h2>报告中心</h2>
+                            <p>AI生成的专业分析报告，来源于您的对话记录</p>
+                        </div>
+                        <button class="btn-primary" onclick="generateReport()">
+                            <i class="fas fa-plus"></i>
+                            生成新报告
+                        </button>
+                    </div>
+                    
+                    <div class="reports-grid">
+                        <div class="report-card featured">
+                            <div class="report-badge">最新</div>
+                            <div class="report-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>月度销售深度分析</h3>
+                                <p class="report-summary">本月销售额增长12.5%，无线耳机和智能手表成为主要增长驱动力，建议加大库存投入...</p>
+                                <div class="report-meta">
+                                    <span class="report-date">
+                                        <i class="fas fa-calendar"></i>
+                                        2024-01-15
+                                    </span>
+                                    <span class="report-type">销售分析</span>
+                                    <span class="report-source">来自对话</span>
+                                </div>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-outline" onclick="addToDashboard('sales-analysis')">
+                                    <i class="fas fa-plus"></i>
+                                    添加到仪表盘
+                                </button>
+                                <button class="btn-primary">下载PDF</button>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="report-content">
+                                <h3>竞品策略分析报告</h3>
+                                <p class="report-summary">深度分析主要竞争对手的价格策略、产品布局和营销手段，提供差异化竞争建议...</p>
+                                <div class="report-meta">
+                                    <span class="report-date">
+                                        <i class="fas fa-calendar"></i>
+                                        2024-01-12
+                                    </span>
+                                    <span class="report-type">竞品分析</span>
+                                    <span class="report-source">来自对话</span>
+                                </div>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn-outline" onclick="addToDashboard('competitor-analysis')">
+                                    <i class="fas fa-plus"></i>
+                                    添加到仪表盘
+                                </button>
+                                <button class="btn-primary">下载PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加图表模态框 -->
+    <div class="modal-overlay" id="addCardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加新图表到仪表盘</h3>
+                <button class="modal-close" onclick="closeAddCardModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-options">
+                    <div class="chart-option" data-chart="sales-forecast">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>销售预测图</h4>
+                        <p>基于历史数据的销售趋势预测</p>
+                    </div>
+                    <div class="chart-option" data-chart="roi-analysis">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>ROI分析图</h4>
+                        <p>广告投放回报率分析</p>
+                    </div>
+                    <div class="chart-option" data-chart="customer-segment">
+                        <i class="fas fa-chart-bar"></i>
+                        <h4>客户分群图</h4>
+                        <p>客户行为和价值分析</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <h3>AI正在思考中...</h3>
+            <p>正在分析您的数据并生成专业建议</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
 </html>
